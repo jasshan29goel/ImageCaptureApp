@@ -1,33 +1,70 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Button, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import LoadingScreen from './LoadingScreen';
 
 interface ImageViewerProps {
   imageUri: string;
   onReset: () => void;
+  onOpenAnother: () => Promise<void>;
 }
 
-export default function ImageViewer({ imageUri, onReset }: ImageViewerProps) {
+export default function ImageViewer({ imageUri, onReset, onOpenAnother }: ImageViewerProps) {
+  const [loading, setLoading] = useState(false);
+
+  const handleOpen = async () => {
+    setLoading(true);
+    await onOpenAnother(); // defined in HomeScreen
+    setLoading(false);
+  };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: imageUri }}
-        contentFit="contain"
-        style={styles.image}
-      />
-      <Button onPress={onReset} title="Take another picture" />
+      <Image source={{ uri: imageUri }} contentFit="contain" style={styles.image} />
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={onReset}>
+          <FontAwesome5 name="camera" size={24} color="white" />
+          <Text style={styles.text}>Back</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={handleOpen}>
+          <FontAwesome5 name="folder-open" size={24} color="white" />
+          <Text style={styles.text}>Open</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 24,
+    flex: 1,
+    backgroundColor: 'black',
   },
   image: {
-    width: 300,
-    aspectRatio: 1,
-    marginBottom: 16,
+    flex: 1,
+    width: '100%',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 32,
+    backgroundColor: 'transparent',
+  },
+  button: {
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 14,
+    color: 'white',
+    marginTop: 4,
   },
 });

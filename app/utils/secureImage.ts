@@ -2,6 +2,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { doc, getDoc } from 'firebase/firestore';
+import { SECURE_IMAGE_EXTENSION } from '../constants/CommonConstants';
 import { verifySignature } from './crypto';
 import { db } from './firebase';
 
@@ -19,7 +20,7 @@ interface SecureImageObject {
  * @returns URI of the saved `.simg` file.
  */
 export async function saveSecureImage(base64: string, signature: string, keyTag: string): Promise<string> {
-  const fileName = `${keyTag}_${Date.now()}.simg`;
+  const fileName = `${keyTag}_${Date.now()}${SECURE_IMAGE_EXTENSION}`;
 
   const secureObject: SecureImageObject = {
     base64,
@@ -50,6 +51,12 @@ export async function pickAndVerifySecureImage(): Promise<string | null> {
   if (result.canceled || !result.assets?.length) return null;
 
   const file = result.assets[0];
+
+  if (!file.name.toLowerCase().endsWith(SECURE_IMAGE_EXTENSION)) {
+    alert(`❌ Please select a valid ${SECURE_IMAGE_EXTENSION} file.`);
+    return null;
+  }
+
   const fileContent = await FileSystem.readAsStringAsync(file.uri);
 
   try {

@@ -1,3 +1,4 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { CameraType, CameraView } from 'expo-camera';
 import { RefObject } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -19,16 +20,23 @@ export default function CameraComponent({
 }: CameraComponentProps) {
   return (
     <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={onOpenImage}>
-          <Text style={styles.text}>Open Picture</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={onTakePicture}>
-          <Text style={styles.text}>Take Picture</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={onFlip}>
-          <Text style={styles.text}>Flip Camera</Text>
-        </TouchableOpacity>
+      <View style={styles.overlay}>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={onOpenImage}>
+            <FontAwesome5 name="folder-open" size={24} color="white" />
+            <Text style={styles.text}>Open</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={onTakePicture}>
+            <FontAwesome5 name="camera" size={24} color="white" />
+            <Text style={styles.text}>Snap</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={onFlip}>
+            <FontAwesome5 name="sync" size={24} color="white" />
+            <Text style={styles.text}>Flip</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </CameraView>
   );
@@ -38,20 +46,23 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
-  buttonContainer: {
+  overlay: {
     flex: 1,
+    justifyContent: 'flex-end',
+  },
+  buttonContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 32,
     backgroundColor: 'transparent',
-    margin: 64,
   },
   button: {
-    flex: 1,
-    alignSelf: 'flex-end',
     alignItems: 'center',
   },
   text: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 14,
     color: 'white',
+    marginTop: 4,
   },
 });

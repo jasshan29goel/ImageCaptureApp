@@ -2,10 +2,11 @@
 
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { useEffect, useRef, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import CameraComponent from '../components/CameraComponent';
 import ImageViewer from '../components/ImageViewer';
+import LoadingScreen from '../components/LoadingScreen';
 
 import { signMessage } from '../utils/crypto';
 import { getDeviceId } from '../utils/device';
@@ -18,33 +19,45 @@ export default function HomeScreen() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const cameraRef = useRef<CameraView>(null);
   const [keyTag, setKeyTag] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-  (async () => {
-    const id = await getDeviceId();
-    setKeyTag(id);
-    if (!id) return;
-    await initializeKeys(id);
-    console.log("✅ Keys initialized");
-  })();
-  }, []);
+    (async () => {
+      try {
+        if (!permission?.granted) {
+          const { granted } = await requestPermission();
+          if (!granted) {
+            alert("Camera permission is required to use this app.");
+            return;
+          }
+        }
 
+        const id = await getDeviceId();
 
-  if (!permission) return <View />;
+        if (!id) {
+          throw new Error("❌ Device ID could not be generated.");
+        }
 
-  if (!permission.granted || !keyTag) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="Grant Camera Permission" />
-      </View>
-    );
+        setKeyTag(id);
+        await initializeKeys(id);
+      } catch (err) {
+        console.error("Initialization failed:", err);
+        alert("App initialization failed. Please try restarting the app.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [permission]);
+
+  if (loading || !permission?.granted || !keyTag) {
+    return <LoadingScreen />;
   }
 
-  async function handleOpenImage() {
+  const handleOpenImage = async () => {
     const uri = await pickAndVerifySecureImage();
     if (uri) setImageUri(uri);
-  }
+  };
+
 
   async function handleTakePicture() {
     const photo = await cameraRef.current?.takePictureAsync({ base64: true });
@@ -63,7 +76,7 @@ export default function HomeScreen() {
   }
 
   if (imageUri) {
-    return <ImageViewer imageUri={imageUri} onReset={() => setImageUri(null)} />;
+    return <ImageViewer imageUri={imageUri} onReset={() => setImageUri(null)} onOpenAnother={handleOpenImage}/>;
   }
 
   return (
@@ -84,8 +97,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  message: {
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
+
 });
