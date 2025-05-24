@@ -1,4 +1,4 @@
-package com.anonymous.ImageCaptureApp
+package com.jasshan.imagecaptureapp
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

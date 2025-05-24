@@ -12,7 +12,7 @@ export default {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.jasshan.imagecaptureapp',
+      bundleIdentifier: 'com.jasshan.dev.imagecaptureapp',
     },
     android: {
       adaptiveIcon: {

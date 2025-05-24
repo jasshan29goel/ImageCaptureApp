@@ -1,4 +1,4 @@
-package com.anonymous.ImageCaptureApp
+package com.jasshan.imagecaptureapp
 
 import android.app.Application
 import android.content.res.Configuration

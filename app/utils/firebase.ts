@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import { initializeApp } from 'firebase/app';
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import { Platform } from 'react-native';
-import { generateKeyPair } from './crypto';
+import { RSAKeychain } from 'react-native-rsa-native';
 
 const extra = Constants.expoConfig?.extra;
 
@@ -26,17 +26,28 @@ console.log('[Firebase] App ID:', firebaseConfig.appId);
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
+
+// Generate a new RSA key pair
+export async function generateKeyPair(keyTag: string): Promise<string> {
+  const keys = await RSAKeychain.generate(keyTag);
+  return keys.public;
+}
+
 // Initialize and store public key in Firestore
 export async function initializeKeys(keyTag: string): Promise<void> {
+  console.log("I was here: " + keyTag);
   const docRef = doc(db, 'public_keys', keyTag);
+  console.log("I was here 2");
   const existingDoc = await getDoc(docRef);
-
+  console.log("I was here 3");
   if (!existingDoc.exists()) {
+    console.log("I was ehre 4");
     const publicKey = await generateKeyPair(keyTag);
-
+    console.log("I was here 5");
     await setDoc(docRef, {
       publicKey,
       createdAt: new Date().toISOString(),
     });
+    console.log("I was here 6");
   }
 }

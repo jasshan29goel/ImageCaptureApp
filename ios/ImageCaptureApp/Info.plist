@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>imagecaptureapp</string>
-          <string>com.anonymous.ImageCaptureApp</string>
+          <string>com.jasshan.dev.imagecaptureapp</string>
         </array>
       </dict>
     </array>
